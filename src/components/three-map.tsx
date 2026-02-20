@@ -153,6 +153,11 @@ export default function ThreeMap({ mapSrc = "/map.jpg", segments = 512, wirefram
     const scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(BG_COLOR, 1.2);
 
+    // World group — offset to center island vertically in view
+    const world = new THREE.Group();
+    world.position.z = -0.055;
+    scene.add(world);
+
     const camera = new THREE.PerspectiveCamera(50, w / h, 0.001, 10);
     camera.position.set(0, CAM_Y_DEFAULT, 0.08);
     camera.lookAt(0, 0, -0.02);
@@ -228,7 +233,7 @@ export default function ThreeMap({ mapSrc = "/map.jpg", segments = 512, wirefram
     });
 
     const terrain = new THREE.Mesh(terrainGeo, terrainMat);
-    scene.add(terrain);
+    world.add(terrain);
 
     // Load texture (initial)
     loader.load(mapSrc, (tex) => {
@@ -251,7 +256,7 @@ export default function ThreeMap({ mapSrc = "/map.jpg", segments = 512, wirefram
     });
     const ocean = new THREE.Mesh(oceanGeo, oceanMat);
     ocean.position.y = -0.002;
-    scene.add(ocean);
+    world.add(ocean);
 
     // ── Markers (floating 3D runes) ────────────────────────────
     const markers: { mesh: THREE.Mesh; area: Area; label: THREE.Sprite }[] = [];
@@ -266,7 +271,7 @@ export default function ThreeMap({ mapSrc = "/map.jpg", segments = 512, wirefram
       // 3D rune group
       const runeGroup = createRuneGroup(area.category, color);
       runeGroup.position.set(ax, pinY, az);
-      scene.add(runeGroup);
+      world.add(runeGroup);
 
       // Invisible hit-target sphere (for raycasting)
       const hitSphere = new THREE.Mesh(
@@ -282,7 +287,7 @@ export default function ThreeMap({ mapSrc = "/map.jpg", segments = 512, wirefram
         new THREE.MeshBasicMaterial({ color: 0xfffbe7, transparent: true, opacity: 0.3 })
       );
       stem.position.set(ax, terrainH + stemH / 2, az);
-      scene.add(stem);
+      world.add(stem);
 
       // Glow halo
       const glow = new THREE.Mesh(
@@ -290,7 +295,7 @@ export default function ThreeMap({ mapSrc = "/map.jpg", segments = 512, wirefram
         new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.1, depthWrite: false })
       );
       glow.position.set(ax, pinY, az);
-      scene.add(glow);
+      world.add(glow);
 
       // Label sprite
       const canvas = document.createElement("canvas");
@@ -315,10 +320,10 @@ export default function ThreeMap({ mapSrc = "/map.jpg", segments = 512, wirefram
       );
       label.scale.set(0.045, 0.006, 1);
       label.position.set(ax, pinY + 0.007, az);
-      scene.add(label);
+      world.add(label);
 
       hitSphere.userData = { area, stem, glow, runeGroup };
-      scene.add(hitSphere);
+      world.add(hitSphere);
       markers.push({ mesh: hitSphere, area, label });
     });
 
@@ -349,7 +354,7 @@ export default function ThreeMap({ mapSrc = "/map.jpg", segments = 512, wirefram
         return tgt.sub(group.position).normalize().multiplyScalar(speed);
       };
       const vel = reset();
-      scene.add(group);
+      world.add(group);
       birds.push({ mesh: group, vel, reset });
     }
 
@@ -380,7 +385,7 @@ export default function ThreeMap({ mapSrc = "/map.jpg", segments = 512, wirefram
 
       const cloud = createCloudMesh(cloudW, cloudH, density * 0.5);
       const shadow = createCloudShadowMesh(cloudW * 1.2, cloudH * 1.2, density * 1.2);
-      scene.add(shadow);
+      world.add(shadow);
 
       const startOnMap = i < CLOUD_COUNT / 2;
       const speed = 0.0008 + Math.random() * 0.002;
@@ -404,7 +409,7 @@ export default function ThreeMap({ mapSrc = "/map.jpg", segments = 512, wirefram
         return new THREE.Vector3(speed, 0, (Math.random() - 0.5) * 0.0004);
       };
       const vel = reset();
-      scene.add(cloud);
+      world.add(cloud);
       clouds.push({ mesh: cloud, shadow, vel, reset });
     }
 
@@ -441,7 +446,7 @@ export default function ThreeMap({ mapSrc = "/map.jpg", segments = 512, wirefram
         return new THREE.Vector3(speed, 0, (Math.random() - 0.5) * 0.0001);
       };
       const vel = reset();
-      scene.add(nimbo);
+      world.add(nimbo);
       clouds.push({ mesh: nimbo, shadow: dummyShadow, vel, reset });
     }
 
@@ -673,8 +678,8 @@ export default function ThreeMap({ mapSrc = "/map.jpg", segments = 512, wirefram
     const panSpeed = s.camera.position.y * 0.7;
     s.camera.position.x -= (dx / window.innerWidth) * panSpeed;
     s.camera.position.z -= (dy / window.innerHeight) * panSpeed;
-    const limitX = TERRAIN_W * 0.45;
-    const limitZ = TERRAIN_H * 0.45;
+    const limitX = TERRAIN_W * 0.15;
+    const limitZ = TERRAIN_H * 0.15;
     s.camera.position.x = THREE.MathUtils.clamp(
       s.camera.position.x,
       -limitX,
