@@ -9,6 +9,7 @@
   --color-dark: #798d73;
   --font-serif: var(--font-playfair);
   --font-sans: var(--font-inter);
+  --font-fantasy: var(--font-cinzel);
 }
 
 body {
@@ -45,6 +46,21 @@ body {
   to {
     transform: translateX(100%);
   }
+}
+
+@keyframes hover-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-hover-in {
+  animation: hover-in 0.25s ease-out forwards;
 }
 
 .animate-fade-in {

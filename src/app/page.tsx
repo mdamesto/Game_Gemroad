@@ -284,6 +284,7 @@ export default function Home() {
               showClouds={leftSettings.showClouds}
               showBirds={leftSettings.showBirds}
               tweaks={leftSettings.tweaks}
+
             />
           )}
 
@@ -301,6 +302,7 @@ export default function Home() {
                   showOverlay={leftSettings.showOverlay}
                   showClouds={leftSettings.showClouds}
                   tweaks={leftSettings.tweaks}
+    
                   onCameraMove={handleLeftCamera}
                   cameraSync={
                     sourceRef.current === "right" ? camState : null
@@ -319,6 +321,7 @@ export default function Home() {
                   showClouds={rightSettings.showClouds}
                   showBirds={rightSettings.showBirds}
                   tweaks={rightSettings.tweaks}
+    
                   onCameraMove={handleRightCamera}
                   cameraSync={
                     sourceRef.current === "left" ? camState : null

@@ -130,24 +130,26 @@ export default function DetailPanel({ area, onClose }: DetailPanelProps) {
             </div>
           )}
 
-          {/* Amenities */}
-          <div className="mt-6 flex flex-wrap gap-2">
-            {["Mountain Views", "Private Access", "Guided Tours"].map((tag) => (
-              <span
-                key={tag}
-                className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-cream/60 font-sans"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
+          {/* Tags */}
+          {area.tags && area.tags.length > 0 && (
+            <div className="mt-6 flex flex-wrap gap-2">
+              {area.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-cream/60 font-sans"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
 
-          {/* Inquire button */}
+          {/* Explore button */}
           <button
             className="mt-8 w-full rounded-full py-3 text-sm tracking-[0.15em] uppercase font-sans transition-all hover:brightness-110"
             style={{ backgroundColor: accentColor, color: "#fffbe7" }}
           >
-            Inquire about this
+            Explore this area
           </button>
 
           <div className="h-8" />

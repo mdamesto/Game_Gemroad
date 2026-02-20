@@ -132,6 +132,8 @@ export default function ThreeMap({ mapSrc = "/map.jpg", segments = 512, wirefram
   } | null>(null);
 
   const [activeArea, setActiveArea] = useState<Area | null>(null);
+  const [hoveredArea, setHoveredArea] = useState<Area | null>(null);
+  const hoveredRef = useRef<Area | null>(null);
   const isDragging = useRef(false);
   const dragPrev = useRef({ x: 0, y: 0 });
   const hasMoved = useRef(false);
@@ -198,11 +200,31 @@ export default function ThreeMap({ mapSrc = "/map.jpg", segments = 512, wirefram
     }
     terrainGeo.computeVertexNormals();
 
+    // Edge alpha map — fades terrain borders into background
+    const alphaSize = 512;
+    const alphaCvs = document.createElement("canvas");
+    alphaCvs.width = alphaSize;
+    alphaCvs.height = alphaSize;
+    const alphaCtx = alphaCvs.getContext("2d")!;
+    const grad = alphaCtx.createRadialGradient(
+      alphaSize / 2, alphaSize / 2, alphaSize * 0.2,
+      alphaSize / 2, alphaSize / 2, alphaSize * 0.5
+    );
+    grad.addColorStop(0, "#ffffff");
+    grad.addColorStop(0.6, "#ffffff");
+    grad.addColorStop(0.85, "#888888");
+    grad.addColorStop(1, "#000000");
+    alphaCtx.fillStyle = grad;
+    alphaCtx.fillRect(0, 0, alphaSize, alphaSize);
+    const alphaMap = new THREE.CanvasTexture(alphaCvs);
+
     const terrainMat = new THREE.MeshStandardMaterial({
       color: 0xffffff,
       roughness: 0.82,
       metalness: 0.0,
       wireframe,
+      transparent: true,
+      alphaMap,
     });
 
     const terrain = new THREE.Mesh(terrainGeo, terrainMat);
@@ -223,7 +245,7 @@ export default function ThreeMap({ mapSrc = "/map.jpg", segments = 512, wirefram
     const oceanGeo = new THREE.PlaneGeometry(2, 2);
     oceanGeo.rotateX(-Math.PI / 2);
     const oceanMat = new THREE.MeshStandardMaterial({
-      color: 0x082540,
+      color: 0x134a6e,
       roughness: 0.95,
       metalness: 0.0,
     });
@@ -231,61 +253,55 @@ export default function ThreeMap({ mapSrc = "/map.jpg", segments = 512, wirefram
     ocean.position.y = -0.002;
     scene.add(ocean);
 
-    // ── Markers ──────────────────────────────────────────────────
+    // ── Markers (floating 3D runes) ────────────────────────────
     const markers: { mesh: THREE.Mesh; area: Area; label: THREE.Sprite }[] = [];
 
     areas.forEach((area) => {
       const color = new THREE.Color(categoryColors[area.category]);
-
-      const pin = new THREE.Mesh(
-        new THREE.SphereGeometry(0.002, 16, 16),
-        new THREE.MeshBasicMaterial({ color: 0xfffbe7 })
-      );
       const terrainH = getTerrainHeight(area.position3D.x, area.position3D.z);
-      const pinY = terrainH + 0.012;
-      pin.position.set(area.position3D.x, pinY, area.position3D.z);
+      const pinY = terrainH + 0.01;
+      const ax = area.position3D.x;
+      const az = area.position3D.z;
 
-      // Vertical stem from terrain to pin
-      const stemLen = pinY - terrainH;
-      const stemGeo = new THREE.CylinderGeometry(0.0003, 0.0003, stemLen, 4);
-      const stem = new THREE.Mesh(
-        stemGeo,
-        new THREE.MeshBasicMaterial({ color: 0xfffbe7, transparent: true, opacity: 0.4 })
+      // 3D rune group
+      const runeGroup = createRuneGroup(area.category, color);
+      runeGroup.position.set(ax, pinY, az);
+      scene.add(runeGroup);
+
+      // Invisible hit-target sphere (for raycasting)
+      const hitSphere = new THREE.Mesh(
+        new THREE.SphereGeometry(0.004, 8, 8),
+        new THREE.MeshBasicMaterial({ visible: false })
       );
-      stem.position.set(area.position3D.x, terrainH + stemLen / 2, area.position3D.z);
+      hitSphere.position.set(ax, pinY, az);
+
+      // Thin stem line
+      const stemH = pinY - terrainH;
+      const stem = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.00015, 0.00015, stemH, 4),
+        new THREE.MeshBasicMaterial({ color: 0xfffbe7, transparent: true, opacity: 0.3 })
+      );
+      stem.position.set(ax, terrainH + stemH / 2, az);
       scene.add(stem);
 
+      // Glow halo
       const glow = new THREE.Mesh(
         new THREE.SphereGeometry(0.004, 16, 16),
-        new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.3 })
+        new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.1, depthWrite: false })
       );
-      glow.position.copy(pin.position);
+      glow.position.set(ax, pinY, az);
       scene.add(glow);
 
-      const ringGeo = new THREE.RingGeometry(0.004, 0.0048, 32);
-      ringGeo.rotateX(-Math.PI / 2);
-      const ring = new THREE.Mesh(
-        ringGeo,
-        new THREE.MeshBasicMaterial({
-          color,
-          transparent: true,
-          opacity: 0.6,
-          side: THREE.DoubleSide,
-        })
-      );
-      ring.position.set(area.position3D.x, pinY - 0.001, area.position3D.z);
-      ring.userData.phase = Math.random() * Math.PI * 2;
-      scene.add(ring);
-
+      // Label sprite
       const canvas = document.createElement("canvas");
       canvas.width = 512;
       canvas.height = 64;
       const ctx = canvas.getContext("2d")!;
-      ctx.font = "500 26px Georgia, serif";
+      ctx.font = "600 28px Georgia, serif";
       ctx.fillStyle = "#fffbe7";
       ctx.textAlign = "center";
       ctx.shadowColor = "rgba(0,0,0,0.95)";
-      ctx.shadowBlur = 10;
+      ctx.shadowBlur = 12;
       ctx.shadowOffsetY = 2;
       ctx.fillText(area.title, 256, 42);
 
@@ -298,12 +314,12 @@ export default function ThreeMap({ mapSrc = "/map.jpg", segments = 512, wirefram
         })
       );
       label.scale.set(0.045, 0.006, 1);
-      label.position.set(area.position3D.x, pinY + 0.008, area.position3D.z);
+      label.position.set(ax, pinY + 0.007, az);
       scene.add(label);
 
-      pin.userData = { area, ring, glow, stem };
-      scene.add(pin);
-      markers.push({ mesh: pin, area, label });
+      hitSphere.userData = { area, stem, glow, runeGroup };
+      scene.add(hitSphere);
+      markers.push({ mesh: hitSphere, area, label });
     });
 
     // ── Birds ────────────────────────────────────────────────────
@@ -457,15 +473,10 @@ export default function ThreeMap({ mapSrc = "/map.jpg", segments = 512, wirefram
       const dt = state.clock.getDelta();
       const elapsed = state.clock.getElapsedTime();
 
-      // Pulse rings
+      // Rune rotation
       state.markers.forEach(({ mesh }) => {
-        const ring = mesh.userData.ring as THREE.Mesh;
-        if (ring) {
-          const phase = (ring.userData.phase as number) || 0;
-          const t = ((elapsed + phase) % 2.5) / 2.5;
-          ring.scale.set(1 + t * 2, 1, 1 + t * 2);
-          (ring.material as THREE.MeshBasicMaterial).opacity = 0.6 * (1 - t);
-        }
+        const rg = mesh.userData.runeGroup as THREE.Group;
+        if (rg) rg.rotation.y = elapsed * 0.4;
       });
 
       // Birds
@@ -500,6 +511,7 @@ export default function ThreeMap({ mapSrc = "/map.jpg", segments = 512, wirefram
         state.markers.map((m) => m.mesh),
         false
       );
+      let currentHover: Area | null = null;
       state.markers.forEach(({ label, mesh }) => {
         (label.material as THREE.SpriteMaterial).opacity =
           THREE.MathUtils.lerp(
@@ -519,6 +531,7 @@ export default function ThreeMap({ mapSrc = "/map.jpg", segments = 512, wirefram
       if (hits.length > 0) {
         const hit = state.markers.find((m) => m.mesh === hits[0].object);
         if (hit) {
+          currentHover = hit.area;
           (hit.label.material as THREE.SpriteMaterial).opacity =
             THREE.MathUtils.lerp(
               (hit.label.material as THREE.SpriteMaterial).opacity,
@@ -534,6 +547,10 @@ export default function ThreeMap({ mapSrc = "/map.jpg", segments = 512, wirefram
                 0.15
               );
         }
+      }
+      if (currentHover !== hoveredRef.current) {
+        hoveredRef.current = currentHover;
+        setHoveredArea(currentHover);
       }
 
       renderer.render(scene, camera);
@@ -613,10 +630,10 @@ export default function ThreeMap({ mapSrc = "/map.jpg", segments = 512, wirefram
       m.label.visible = showMarkers;
       const g = m.mesh.userData.glow as THREE.Mesh | undefined;
       const stem = m.mesh.userData.stem as THREE.Mesh | undefined;
-      const ring = m.mesh.userData.ring as THREE.Mesh | undefined;
+      const rg = m.mesh.userData.runeGroup as THREE.Group | undefined;
       if (g) g.visible = showMarkers;
       if (stem) stem.visible = showMarkers;
-      if (ring) ring.visible = showMarkers;
+      if (rg) rg.visible = showMarkers;
     }
     for (const c of s.clouds) {
       c.mesh.visible = showClouds;
@@ -729,6 +746,33 @@ export default function ThreeMap({ mapSrc = "/map.jpg", segments = 512, wirefram
 
 
 
+      {/* Hover tooltip */}
+      {hoveredArea && !activeArea && (
+        <div className="pointer-events-none fixed bottom-8 left-0 right-0 z-30 flex justify-center">
+          <div className="animate-hover-in flex items-center gap-4 rounded-2xl bg-black/60 backdrop-blur-2xl border border-white/[0.08] shadow-2xl shadow-black/50 px-6 py-4 max-w-md">
+            {/* Accent bar */}
+            <div
+              className="w-1 self-stretch rounded-full shrink-0"
+              style={{ backgroundColor: categoryColors[hoveredArea.category] }}
+            />
+            <div className="flex flex-col gap-1 min-w-0">
+              <span
+                className="text-[9px] font-sans font-semibold tracking-[0.2em] uppercase"
+                style={{ color: categoryColors[hoveredArea.category] }}
+              >
+                {hoveredArea.eyebrow}
+              </span>
+              <h3 className="font-fantasy text-lg text-cream leading-tight tracking-wide">
+                {hoveredArea.title}
+              </h3>
+              <p className="text-[11px] text-cream/50 font-sans leading-relaxed line-clamp-2">
+                {hoveredArea.description}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <DetailPanel area={activeArea} onClose={() => setActiveArea(null)} />
     </section>
   );
@@ -760,6 +804,154 @@ function createBird(): THREE.Group {
   const s = 0.2 + Math.random() * 0.3;
   g.scale.set(s, s, s);
   return g;
+}
+
+/** Create a 3D rune marker group for a given biome. */
+function createRuneGroup(category: string, color: THREE.Color): THREE.Group {
+  const group = new THREE.Group();
+  const s = 0.002; // symbol radius
+  const thick = 0.0003; // extrude depth
+
+  const mat = new THREE.MeshBasicMaterial({
+    color,
+    transparent: true,
+    opacity: 0.9,
+    depthWrite: false,
+  });
+  const whiteMat = new THREE.MeshBasicMaterial({
+    color: 0xffffff,
+    transparent: true,
+    opacity: 0.95,
+    depthWrite: false,
+  });
+
+  // Outer torus ring
+  const outerRing = new THREE.Mesh(
+    new THREE.TorusGeometry(s * 1.4, 0.0001, 6, 32),
+    mat
+  );
+  outerRing.rotation.x = Math.PI / 2;
+  group.add(outerRing);
+
+  // Inner torus ring
+  const innerRing = new THREE.Mesh(
+    new THREE.TorusGeometry(s * 0.85, 0.00006, 6, 32),
+    mat.clone()
+  );
+  (innerRing.material as THREE.MeshBasicMaterial).opacity = 0.5;
+  innerRing.rotation.x = Math.PI / 2;
+  group.add(innerRing);
+
+  // Helper: create a thin horizontal bar in XZ plane
+  const makeBar = (length: number, w: number): THREE.BoxGeometry =>
+    new THREE.BoxGeometry(length, thick, w);
+
+  switch (category) {
+    case "frost": {
+      // Snowflake: 3 crossed bars + 6 small branch bars
+      for (let i = 0; i < 3; i++) {
+        const bar = new THREE.Mesh(makeBar(s * 2, 0.00025), whiteMat);
+        bar.rotation.y = (i * Math.PI) / 3;
+        group.add(bar);
+        // Two small branches per arm direction
+        const angle = (i * Math.PI) / 3;
+        for (const sign of [1, -1]) {
+          const bx = Math.cos(angle) * s * 0.55 * sign;
+          const bz = Math.sin(angle) * s * 0.55 * sign;
+          const branch = new THREE.Mesh(makeBar(s * 0.45, 0.0002), whiteMat);
+          branch.position.set(bx, 0, bz);
+          branch.rotation.y = angle + (Math.PI / 4) * sign;
+          group.add(branch);
+        }
+      }
+      break;
+    }
+    case "forest": {
+      // Tree: trunk (vertical cylinder) + 2 cone layers
+      const trunk = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.00015, 0.0002, s * 0.8, 4),
+        whiteMat
+      );
+      trunk.position.y = -s * 0.1;
+      group.add(trunk);
+      const cone1 = new THREE.Mesh(
+        new THREE.ConeGeometry(s * 0.7, s * 0.9, 6),
+        whiteMat
+      );
+      cone1.position.y = s * 0.35;
+      group.add(cone1);
+      const cone2 = new THREE.Mesh(
+        new THREE.ConeGeometry(s * 0.45, s * 0.65, 6),
+        whiteMat
+      );
+      cone2.position.y = s * 0.75;
+      group.add(cone2);
+      break;
+    }
+    case "volcanic": {
+      // Flame: diamond/rhombus shape pointing up
+      const flameShape = new THREE.Shape();
+      flameShape.moveTo(0, s * 1.1);
+      flameShape.quadraticCurveTo(s * 0.45, s * 0.3, s * 0.3, -s * 0.2);
+      flameShape.quadraticCurveTo(s * 0.15, -s * 0.6, 0, -s * 0.7);
+      flameShape.quadraticCurveTo(-s * 0.15, -s * 0.6, -s * 0.3, -s * 0.2);
+      flameShape.quadraticCurveTo(-s * 0.45, s * 0.3, 0, s * 1.1);
+      const flameGeo = new THREE.ExtrudeGeometry(flameShape, {
+        depth: thick,
+        bevelEnabled: false,
+      });
+      const flame = new THREE.Mesh(flameGeo, whiteMat);
+      flame.rotation.x = -Math.PI / 2;
+      flame.position.y = thick / 2;
+      group.add(flame);
+      break;
+    }
+    case "desert": {
+      // Sun: center sphere + 8 rays
+      const center = new THREE.Mesh(
+        new THREE.SphereGeometry(s * 0.25, 12, 12),
+        whiteMat
+      );
+      group.add(center);
+      for (let i = 0; i < 8; i++) {
+        const a = (i * Math.PI) / 4;
+        const ray = new THREE.Mesh(makeBar(s * 0.55, 0.0002), whiteMat);
+        const dist = s * 0.65;
+        ray.position.set(Math.cos(a) * dist, 0, Math.sin(a) * dist);
+        ray.rotation.y = a;
+        group.add(ray);
+      }
+      break;
+    }
+    case "arcane": {
+      // Pentagram: 5 bars connecting star points
+      const pts: [number, number][] = [];
+      for (let i = 0; i < 5; i++) {
+        const a = (i * 2 * Math.PI) / 5 - Math.PI / 2;
+        pts.push([Math.cos(a) * s, Math.sin(a) * s]);
+      }
+      for (let i = 0; i < 5; i++) {
+        const [x1, z1] = pts[i];
+        const [x2, z2] = pts[(i + 2) % 5];
+        const dx = x2 - x1;
+        const dz = z2 - z1;
+        const len = Math.sqrt(dx * dx + dz * dz);
+        const bar = new THREE.Mesh(makeBar(len, 0.00025), whiteMat);
+        bar.position.set((x1 + x2) / 2, 0, (z1 + z2) / 2);
+        bar.rotation.y = -Math.atan2(dz, dx);
+        group.add(bar);
+      }
+      // center dot
+      const dot = new THREE.Mesh(
+        new THREE.SphereGeometry(s * 0.1, 8, 8),
+        whiteMat
+      );
+      group.add(dot);
+      break;
+    }
+  }
+
+  return group;
 }
 
 /** Generate a soft cumulus cloud canvas texture. */

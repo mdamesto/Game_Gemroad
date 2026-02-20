@@ -5,288 +5,231 @@ export interface Area {
   description: string;
   image: string;
   gallery: string[];
+  tags: string[];
   position3D: { x: number; y: number; z: number };
-  category: "accommodation" | "dining" | "recreation" | "wellness" | "golf" | "realestate";
+  category: "frost" | "forest" | "volcanic" | "desert" | "arcane";
 }
 
 export const areas: Area[] = [
+  // ── Frost / Ice (north) ─────────────────────────────────────────────
   {
-    id: "pool-fitness",
-    title: "Pool & Fitness",
-    eyebrow: "Amenities",
+    id: "frostpeak-citadel",
+    title: "Frostpeak Citadel",
+    eyebrow: "Frost Lands",
     description:
-      "A relaxing indoor swimming pool and state-of-the-art fitness center overlooking Primland's magnificent grounds.",
-    image:
-      "https://www.datocms-assets.com/164288/1767624219-pool-main.jpg?auto=format&w=800",
-    gallery: [
-      "https://www.datocms-assets.com/164288/1767624219-pool-main.jpg?auto=format&w=1200",
-      "https://www.datocms-assets.com/164288/1767624337-pool.jpg?auto=format&w=1200",
-    ],
-    position3D: { x: -0.062, y: 0.0088, z: 0.0163 },
-    category: "wellness",
+      "An ancient fortress carved into the heart of a glacier. Its frozen spires catch the northern lights, and its vaults are said to hold relics from the Age of Winter.",
+    image: "",
+    gallery: [],
+    tags: ["Dungeon", "Lore", "Boss Fight"],
+    position3D: { x: -0.02, y: 0, z: -0.108 },
+    category: "frost",
   },
   {
-    id: "stables-saloon",
-    title: "Stables Saloon",
-    eyebrow: "Amenities",
+    id: "frozen-falls",
+    title: "Frozen Falls",
+    eyebrow: "Frost Lands",
     description:
-      "Primland's former horse stables promises traditional Southern food and music at its best. Available year-round for private parties and events, the rustic Stables Saloon is a regular host of live bluegrass.",
-    image:
-      "https://www.datocms-assets.com/164288/1759243198-stables-saloon.jpg?auto=format&w=800",
-    gallery: [
-      "https://www.datocms-assets.com/164288/1759243198-stables-saloon.jpg?auto=format&w=1200",
-      "https://www.datocms-assets.com/164288/1756738615-prim-dine-stables-southernsupper.webp?auto=format&w=1200",
-    ],
-    position3D: { x: 0.0449, y: 0.0089, z: 0.0044 },
-    category: "dining",
+      "A colossal waterfall suspended in time by an eternal frost spell. Behind the ice curtain, a hidden cave network shelters rare frost crystals and ice elementals.",
+    image: "",
+    gallery: [],
+    tags: ["Exploration", "Resources", "Hidden Path"],
+    position3D: { x: -0.08, y: 0, z: -0.092 },
+    category: "frost",
   },
   {
-    id: "auberge-residences",
-    title: "Auberge Residences",
-    eyebrow: "Real Estate",
+    id: "glacial-expanse",
+    title: "Glacial Expanse",
+    eyebrow: "Frost Lands",
     description:
-      "A collection of 25 finely furnished, three, four, and five bedroom retreats designed by Hart Howerton that reflect the timeless beauty of the mountain landscape.",
-    image:
-      "https://www.datocms-assets.com/164288/1756733927-residences.jpg?auto=format&w=800",
-    gallery: [
-      "https://www.datocms-assets.com/164288/1756733927-residences.jpg?auto=format&w=1200",
-      "https://www.datocms-assets.com/164288/1756913790-int01_overall-living_b3.jpg?auto=format&w=1200",
-      "https://www.datocms-assets.com/164288/1756913814-int04_primary-bathroom_b3.jpg?auto=format&w=1200",
-    ],
-    position3D: { x: -0.0493, y: 0.0067, z: 0.046 },
-    category: "realestate",
+      "A vast, wind-swept tundra stretching across the northern reaches. Frost wolves roam in packs, and ancient bones jut from the permafrost like forgotten monuments.",
+    image: "",
+    gallery: [],
+    tags: ["Open World", "Hunting", "Survival"],
+    position3D: { x: 0.05, y: 0, z: -0.1 },
+    category: "frost",
+  },
+
+  // ── Forest / Jungle (west) ─────────────────────────────────────────
+  {
+    id: "emerald-canopy",
+    title: "Emerald Canopy",
+    eyebrow: "Verdant Wilds",
+    description:
+      "A thriving treetop settlement woven between the giant canopy trees. Rope bridges connect thatched platforms where the forest dwellers trade rare herbs and enchanted wood.",
+    image: "",
+    gallery: [],
+    tags: ["Village", "Trading", "Quest Hub"],
+    position3D: { x: -0.14, y: 0, z: -0.027 },
+    category: "forest",
   },
   {
-    id: "the-estates",
-    title: "Custom Estates",
-    eyebrow: "Real Estate",
+    id: "serpent-river",
+    title: "Serpent River",
+    eyebrow: "Verdant Wilds",
     description:
-      "Twenty-six homesites spanning 2 to 5 acres each, set in the most coveted overlook locations on the property. Designed with guidance from Hart Howerton.",
-    image:
-      "https://www.datocms-assets.com/164288/1756734165-estates.jpg?auto=format&w=800",
-    gallery: [
-      "https://www.datocms-assets.com/164288/1756734165-estates.jpg?auto=format&w=1200",
-    ],
-    position3D: { x: 0.0833, y: 0.0089, z: -0.009 },
-    category: "realestate",
+      "A winding river that snakes through the densest part of the jungle. Its emerald waters hide giant serpents and lead to forgotten temples overgrown with vines.",
+    image: "",
+    gallery: [],
+    tags: ["Water Route", "Fishing", "Danger Zone"],
+    position3D: { x: -0.12, y: 0, z: -0.045 },
+    category: "forest",
   },
   {
-    id: "court-side",
-    title: "Racquet Sports",
-    eyebrow: "Outdoor Pursuits",
+    id: "ancient-grove",
+    title: "Ancient Grove",
+    eyebrow: "Verdant Wilds",
     description:
-      "Soft-surface tennis courts available for day and night play, with pickleball, padel, and bocce courts arriving in 2027.",
-    image:
-      "https://www.datocms-assets.com/164288/1756728882-padel.jpg?auto=format&w=800",
-    gallery: [
-      "https://www.datocms-assets.com/164288/1756728882-padel.jpg?auto=format&w=1200",
-    ],
-    position3D: { x: 0.0414, y: 0.0089, z: 0.0162 },
-    category: "recreation",
+      "A sacred clearing where the oldest trees in the world still whisper prophecies. Druids gather here during solstice to commune with the spirit of the forest.",
+    image: "",
+    gallery: [],
+    tags: ["Sacred Site", "Lore", "Magic"],
+    position3D: { x: -0.16, y: 0, z: 0.005 },
+    category: "forest",
   },
   {
-    id: "paddleboarding",
-    title: "Paddleboarding",
-    eyebrow: "Outdoor Pursuits",
+    id: "mangrove-shore",
+    title: "Mangrove Shore",
+    eyebrow: "Verdant Wilds",
     description:
-      "Half-day guided kayaking and paddleboarding on the Talbott Reservoir at 2,600 feet of elevation, surrounded by ancient forests.",
-    image:
-      "https://www.datocms-assets.com/164288/1756728089-watersports.jpg?auto=format&w=800",
-    gallery: [
-      "https://www.datocms-assets.com/164288/1756728089-watersports.jpg?auto=format&w=1200",
-    ],
-    position3D: { x: -0.0158, y: 0.0068, z: -0.0194 },
-    category: "recreation",
+      "Where the jungle meets the ocean, tangled roots form a labyrinth of tidal pools. Bioluminescent creatures light the shallows at night, and smugglers use the maze to hide their boats.",
+    image: "",
+    gallery: [],
+    tags: ["Coastal", "Stealth", "Night Event"],
+    position3D: { x: -0.168, y: 0, z: 0.04 },
+    category: "forest",
+  },
+
+  // ── Volcanic / Mountains (center) ──────────────────────────────────
+  {
+    id: "dragons-maw",
+    title: "Dragon's Maw",
+    eyebrow: "Scorched Peaks",
+    description:
+      "The island's active volcano, its crater glowing with molten lava. Ancient dragons once nested in its caldera, and their fire-touched eggs still smolder in hidden alcoves.",
+    image: "",
+    gallery: [],
+    tags: ["Boss Fight", "Endgame", "Legendary Loot"],
+    position3D: { x: -0.025, y: 0, z: -0.038 },
+    category: "volcanic",
   },
   {
-    id: "all-terrain",
-    title: "All-Terrain Exploring",
-    eyebrow: "Outdoor Pursuits",
+    id: "ember-forge",
+    title: "Ember Forge",
+    eyebrow: "Scorched Peaks",
     description:
-      "Guided ATV adventures across 12,000 acres of rugged mountain terrain. Wind through oak avenues, splash across streams, and tackle muddy tracks.",
-    image:
-      "https://www.datocms-assets.com/164288/1756732956-rv.jpg?auto=format&w=800",
-    gallery: [
-      "https://www.datocms-assets.com/164288/1756732956-rv.jpg?auto=format&w=1200",
-    ],
-    position3D: { x: -0.0065, y: 0.0081, z: 0.0195 },
-    category: "recreation",
+      "A dwarven smithy built into the volcanic rock, powered by rivers of magma. The finest weapons and armor on the island are hammered here from obsidian and dragonscale.",
+    image: "",
+    gallery: [],
+    tags: ["Crafting", "Upgrades", "NPC"],
+    position3D: { x: -0.055, y: 0, z: -0.015 },
+    category: "volcanic",
   },
   {
-    id: "woodland-trails",
-    title: "Woodland Trails",
-    eyebrow: "Outdoor Pursuits",
+    id: "obsidian-pass",
+    title: "Obsidian Pass",
+    eyebrow: "Scorched Peaks",
     description:
-      "Private trails graded for every intensity, from gentle nature walks to strenuous ridge hikes. Guided by the resort's resident Naturalist.",
-    image:
-      "https://www.datocms-assets.com/164288/1756732744-hiking.jpg?auto=format&w=800",
-    gallery: [
-      "https://www.datocms-assets.com/164288/1756732744-hiking.jpg?auto=format&w=1200",
-    ],
-    position3D: { x: -0.0656, y: 0.009, z: 0.0103 },
-    category: "recreation",
+      "A treacherous mountain pass carved through volcanic glass. The narrow trail connects the northern frost lands to the southern lowlands, guarded by stone golems.",
+    image: "",
+    gallery: [],
+    tags: ["Passage", "Combat", "Shortcut"],
+    position3D: { x: 0.005, y: 0, z: -0.025 },
+    category: "volcanic",
+  },
+
+  // ── Desert (east) ──────────────────────────────────────────────────
+  {
+    id: "sandstone-ruins",
+    title: "Sandstone Ruins",
+    eyebrow: "Golden Wastes",
+    description:
+      "The crumbling remains of a once-great desert civilization. Half-buried temples still hold traps and treasures, and sand wraiths patrol the corridors at dusk.",
+    image: "",
+    gallery: [],
+    tags: ["Dungeon", "Puzzle", "Treasure"],
+    position3D: { x: 0.1, y: 0, z: -0.04 },
+    category: "desert",
   },
   {
-    id: "horseback-riding",
-    title: "Horseback Riding",
-    eyebrow: "Outdoor Pursuits",
+    id: "whispering-dunes",
+    title: "Whispering Dunes",
+    eyebrow: "Golden Wastes",
     description:
-      "Guided horseback rides along leafy pathways and stony ridges, with mounts suited for every ability level.",
-    image:
-      "https://www.datocms-assets.com/164288/1756729898-horse-riding.jpg?auto=format&w=800",
-    gallery: [
-      "https://www.datocms-assets.com/164288/1756729898-horse-riding.jpg?auto=format&w=1200",
-    ],
-    position3D: { x: -0.0601, y: 0.0088, z: 0.0117 },
-    category: "recreation",
+      "Endless rolling sand dunes that sing in the wind. Nomadic traders cross this expanse on armored sand beetles, and mirages lure the unwary into quicksand traps.",
+    image: "",
+    gallery: [],
+    tags: ["Open World", "Mount", "Random Events"],
+    position3D: { x: 0.12, y: 0, z: -0.012 },
+    category: "desert",
   },
   {
-    id: "award-winning-golf",
-    title: "Award-Winning Golf",
-    eyebrow: "Golf",
+    id: "sun-temple",
+    title: "Temple of the Sun",
+    eyebrow: "Golden Wastes",
     description:
-      "A 7,051-yard, 18-hole championship course designed by Donald Steel, ranked the No. 1 public course in Virginia.",
-    image:
-      "https://www.datocms-assets.com/164288/1756725018-golf.jpg?auto=format&w=800",
-    gallery: [
-      "https://www.datocms-assets.com/164288/1756725018-golf.jpg?auto=format&w=1200",
-    ],
-    position3D: { x: -0.0687, y: 0.007, z: 0.0405 },
-    category: "golf",
+      "A golden pyramid that channels the desert sun into pure energy. Its priests guard an ancient solar relic capable of scorching entire armies — or healing mortal wounds.",
+    image: "",
+    gallery: [],
+    tags: ["Sacred Site", "Lore", "Boss Fight"],
+    position3D: { x: 0.08, y: 0, z: 0.005 },
+    category: "desert",
   },
   {
-    id: "fly-fishing",
-    title: "Catch & Release Fly Fishing",
-    eyebrow: "Outdoor Pursuits",
+    id: "oasis-of-echoes",
+    title: "Oasis of Echoes",
+    eyebrow: "Golden Wastes",
     description:
-      "Three stocked ponds and a six-mile stretch of the Dan River offer world-class catch-and-release fly fishing.",
-    image:
-      "https://www.datocms-assets.com/164288/1756725891-fishing.jpg?auto=format&w=800",
-    gallery: [
-      "https://www.datocms-assets.com/164288/1756725891-fishing.jpg?auto=format&w=1200",
-    ],
-    position3D: { x: -0.0107, y: 0.0081, z: 0.0076 },
-    category: "recreation",
+      "A lush oasis hidden among the dunes where time flows differently. Travelers rest here to recover, but linger too long and the echoes of past visitors begin to whisper secrets — and lies.",
+    image: "",
+    gallery: [],
+    tags: ["Rest Point", "Trading", "Side Quest"],
+    position3D: { x: 0.14, y: 0, z: 0.02 },
+    category: "desert",
+  },
+
+  // ── Arcane / Crystal (south) ───────────────────────────────────────
+  {
+    id: "arcane-nexus",
+    title: "Arcane Nexus",
+    eyebrow: "Crystal Veil",
+    description:
+      "The pulsing heart of the island's magic, where ley lines converge in a storm of violet energy. Mages who enter the nexus can amplify their powers — at great personal risk.",
+    image: "",
+    gallery: [],
+    tags: ["Magic", "Endgame", "Power-Up"],
+    position3D: { x: -0.045, y: 0, z: 0.06 },
+    category: "arcane",
   },
   {
-    id: "the-lodge",
-    title: "The Lodge",
-    eyebrow: "Accommodation",
+    id: "crystal-spires",
+    title: "Crystal Spires",
+    eyebrow: "Crystal Veil",
     description:
-      "The central hub of the Primland experience. The Lodge features the Great Hall with soaring ceilings and mountain views, an acclaimed wine room, and fine dining.",
-    image:
-      "https://www.datocms-assets.com/164288/1753108566-primland-thelodge-thumb.jpg?auto=format&w=800",
-    gallery: [
-      "https://www.datocms-assets.com/164288/1753108566-primland-thelodge-thumb.jpg?auto=format&w=1200",
-    ],
-    position3D: { x: -0.0694, y: 0.0088, z: 0.0262 },
-    category: "accommodation",
+      "Towering crystal formations that hum with arcane resonance. Their facets refract moonlight into prismatic beams that reveal hidden glyphs and unlock sealed portals.",
+    image: "",
+    gallery: [],
+    tags: ["Exploration", "Puzzle", "Night Event"],
+    position3D: { x: -0.02, y: 0, z: 0.05 },
+    category: "arcane",
   },
   {
-    id: "pinnacle-cottages",
-    title: "Pinnacle Cottages",
-    eyebrow: "Accommodation",
+    id: "enchanted-mists",
+    title: "Enchanted Mists",
+    eyebrow: "Crystal Veil",
     description:
-      "Chalet-like accommodations perched at the mountain's edge offering bird's-eye views of the Blue Ridge with open stone fireplaces.",
-    image:
-      "https://www.datocms-assets.com/164288/1756735905-pinnacle.jpg?auto=format&w=800",
-    gallery: [
-      "https://www.datocms-assets.com/164288/1756735905-pinnacle.jpg?auto=format&w=1200",
-    ],
-    position3D: { x: 0.0068, y: 0.0068, z: -0.0096 },
-    category: "accommodation",
-  },
-  {
-    id: "tree-houses",
-    title: "Tree Houses",
-    eyebrow: "Accommodation",
-    description:
-      "Perched in the treetops at an elevation of 2,700 feet, these 440-square-foot retreats are crafted from aromatic red cedar.",
-    image:
-      "https://www.datocms-assets.com/164288/1756726495-tree-houses.jpg?auto=format&w=800",
-    gallery: [
-      "https://www.datocms-assets.com/164288/1756726495-tree-houses.jpg?auto=format&w=1200",
-    ],
-    position3D: { x: -0.0559, y: 0.0088, z: 0.0225 },
-    category: "accommodation",
-  },
-  {
-    id: "moonshine-tales",
-    title: "Moonshine Tales",
-    eyebrow: "Culture",
-    description:
-      "Cocktails and flights celebrating the rich history of the Appalachian moonshine trade, with live bluegrass music.",
-    image:
-      "https://www.datocms-assets.com/164288/1756730165-moonshine.jpg?auto=format&w=800",
-    gallery: [
-      "https://www.datocms-assets.com/164288/1756730165-moonshine.jpg?auto=format&w=1200",
-    ],
-    position3D: { x: -0.0824, y: 0.007, z: 0.0412 },
-    category: "dining",
-  },
-  {
-    id: "shooting",
-    title: "Shooting",
-    eyebrow: "Outdoor Pursuits",
-    description:
-      "Hunting and wingshooting across the estate's vast acreage — deer, turkey, pheasant, quail, and chukar on guided excursions.",
-    image:
-      "https://www.datocms-assets.com/164288/1756730838-shooting.jpg?auto=format&w=800",
-    gallery: [
-      "https://www.datocms-assets.com/164288/1756730838-shooting.jpg?auto=format&w=1200",
-    ],
-    position3D: { x: -0.0345, y: 0.0088, z: 0.0355 },
-    category: "recreation",
-  },
-  {
-    id: "yoga",
-    title: "Yoga & Wellness",
-    eyebrow: "Wellness",
-    description:
-      "Nature hikes, guided meditation, and yoga sessions set against mountain panoramas with a wellness menu featuring locally sourced ingredients.",
-    image:
-      "https://www.datocms-assets.com/164288/1756732493-yoga.jpg?auto=format&w=800",
-    gallery: [
-      "https://www.datocms-assets.com/164288/1756732493-yoga.jpg?auto=format&w=1200",
-    ],
-    position3D: { x: 0.0029, y: 0.0084, z: 0.0421 },
-    category: "wellness",
-  },
-  {
-    id: "mountaintop-bar",
-    title: "Mountaintop Bar",
-    eyebrow: "Dining",
-    description:
-      "An elevated bar experience with panoramic views of the Blue Ridge Mountains. Craft cocktails and fine spirits at 3,000 feet.",
-    image:
-      "https://www.datocms-assets.com/164288/1756737543-bar.jpg?auto=format&w=800",
-    gallery: [
-      "https://www.datocms-assets.com/164288/1756737543-bar.jpg?auto=format&w=1200",
-    ],
-    position3D: { x: -0.0082, y: 0.0029, z: 0.0 },
-    category: "dining",
-  },
-  {
-    id: "mountaintop-restaurant",
-    title: "Mountaintop Restaurant",
-    eyebrow: "Dining",
-    description:
-      "Fine dining at the summit with breathtaking views. Seasonal menus featuring locally sourced ingredients from the Blue Ridge region.",
-    image:
-      "https://www.datocms-assets.com/164288/1753449358-primland-restaurant.jpg?auto=format&w=800",
-    gallery: [
-      "https://www.datocms-assets.com/164288/1753449358-primland-restaurant.jpg?auto=format&w=1200",
-    ],
-    position3D: { x: -0.0123, y: 0.0021, z: 0.0018 },
-    category: "dining",
+      "A valley perpetually shrouded in purple fog. Reality bends within the mists — paths shift, time loops, and spectral guardians test the resolve of those who seek the Veil's core.",
+    image: "",
+    gallery: [],
+    tags: ["Labyrinth", "Lore", "Hidden Boss"],
+    position3D: { x: -0.09, y: 0, z: 0.075 },
+    category: "arcane",
   },
 ];
 
 export const categoryColors: Record<Area["category"], string> = {
-  accommodation: "#a8611a",
-  dining: "#c4842d",
-  recreation: "#456a4b",
-  wellness: "#7a9a6d",
-  golf: "#3d5c3a",
-  realestate: "#8b7355",
+  frost: "#7ec8e3",
+  forest: "#4a9e5c",
+  volcanic: "#e8632b",
+  desert: "#d4a843",
+  arcane: "#b45ce6",
 };
