@@ -41,6 +41,48 @@ function settingsKey(s: ViewSettings) {
   return `${s.mapSrc}-${s.segments}`;
 }
 
+// ── Toggle switch ────────────────────────────────────────────────────
+function Toggle({
+  checked,
+  onChange,
+  label,
+}: {
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  label: string;
+}) {
+  return (
+    <label className="flex items-center justify-between gap-3 cursor-pointer group py-1">
+      <span className="text-[11px] text-cream/60 font-sans group-hover:text-cream/90 transition-colors">
+        {label}
+      </span>
+      <button
+        role="switch"
+        aria-checked={checked}
+        onClick={() => onChange(!checked)}
+        className={`relative w-8 h-[18px] rounded-full transition-colors duration-200 ${
+          checked ? "bg-main" : "bg-white/10"
+        }`}
+      >
+        <span
+          className={`absolute top-[2px] left-[2px] w-[14px] h-[14px] rounded-full bg-cream shadow-sm transition-transform duration-200 ${
+            checked ? "translate-x-[14px]" : "translate-x-0"
+          }`}
+        />
+      </button>
+    </label>
+  );
+}
+
+// ── Group label ──────────────────────────────────────────────────────
+function GroupLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="text-[9px] font-sans font-semibold tracking-[0.15em] uppercase text-cream/30 mb-0.5">
+      {children}
+    </span>
+  );
+}
+
 // ── Slider row ──────────────────────────────────────────────────────
 function TweakSlider({
   label,
@@ -67,7 +109,7 @@ function TweakSlider({
         step={step}
         value={value}
         onChange={(e) => onChange(parseFloat(e.target.value))}
-        className="flex-1 h-1 accent-cream/60"
+        className="flex-1 h-1 accent-main"
       />
       <span className="text-[10px] text-cream/40 w-8 text-right tabular-nums">
         {value.toFixed(2)}
@@ -87,130 +129,85 @@ function ViewPanel({
   onChange: (s: ViewSettings) => void;
 }) {
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-3">
       {label && (
         <span className="text-[10px] font-sans tracking-widest uppercase text-cream/40">
           {label}
         </span>
       )}
 
-      {/* Map select */}
-      <div className="flex items-center gap-2">
-        <span className="text-[10px] text-cream/50 w-14">Map</span>
-        <div className="flex gap-1">
-          {MAP_OPTIONS.map((m) => (
-            <button
-              key={m.value}
-              onClick={() => onChange({ ...settings, mapSrc: m.value })}
-              className={`px-2 py-0.5 rounded text-[10px] font-sans transition-all ${
-                settings.mapSrc === m.value
-                  ? "bg-cream/15 text-cream"
-                  : "text-cream/40 hover:text-cream/70"
-              }`}
-            >
-              {m.label}
-            </button>
-          ))}
+      {/* ── Source ──────────────────────────────────────────────── */}
+      <div className="flex flex-col gap-2">
+        <GroupLabel>Source</GroupLabel>
+
+        {/* Map select */}
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] text-cream/60 w-16 shrink-0">Map</span>
+          <div className="flex gap-1">
+            {MAP_OPTIONS.map((m) => (
+              <button
+                key={m.value}
+                onClick={() => onChange({ ...settings, mapSrc: m.value })}
+                className={`px-2.5 py-1 rounded-md text-[10px] font-sans transition-all ${
+                  settings.mapSrc === m.value
+                    ? "bg-main/40 text-cream ring-1 ring-main/50"
+                    : "bg-white/5 text-cream/40 hover:bg-white/10 hover:text-cream/70"
+                }`}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Segments select */}
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] text-cream/60 w-16 shrink-0">Detail</span>
+          <div className="flex gap-1">
+            {SEGMENT_OPTIONS.map((seg) => (
+              <button
+                key={seg}
+                onClick={() => onChange({ ...settings, segments: seg })}
+                className={`px-2.5 py-1 rounded-md text-[10px] font-sans transition-all ${
+                  settings.segments === seg
+                    ? "bg-main/40 text-cream ring-1 ring-main/50"
+                    : "bg-white/5 text-cream/40 hover:bg-white/10 hover:text-cream/70"
+                }`}
+              >
+                {seg}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Segments select */}
-      <div className="flex items-center gap-2">
-        <span className="text-[10px] text-cream/50 w-14">Segments</span>
-        <div className="flex gap-1">
-          {SEGMENT_OPTIONS.map((seg) => (
-            <button
-              key={seg}
-              onClick={() => onChange({ ...settings, segments: seg })}
-              className={`px-2 py-0.5 rounded text-[10px] font-sans transition-all ${
-                settings.segments === seg
-                  ? "bg-cream/15 text-cream"
-                  : "text-cream/40 hover:text-cream/70"
-              }`}
-            >
-              {seg}
-            </button>
-          ))}
-        </div>
+      <div className="border-t border-white/[0.06]" />
+
+      {/* ── Rendering ──────────────────────────────────────────── */}
+      <div className="flex flex-col">
+        <GroupLabel>Rendering</GroupLabel>
+        <Toggle label="Wireframe" checked={settings.wireframe} onChange={(v) => onChange({ ...settings, wireframe: v })} />
+        <Toggle label="Texture" checked={settings.showTexture} onChange={(v) => onChange({ ...settings, showTexture: v })} />
+        <Toggle label="Overlay" checked={settings.showOverlay} onChange={(v) => onChange({ ...settings, showOverlay: v })} />
       </div>
 
-      {/* Toggles */}
-      <div className="flex items-center gap-4">
-        <label className="flex items-center gap-1.5 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={settings.wireframe}
-            onChange={(e) =>
-              onChange({ ...settings, wireframe: e.target.checked })
-            }
-            className="accent-cream/60 w-3 h-3"
-          />
-          <span className="text-[10px] text-cream/50 font-sans">Wireframe</span>
-        </label>
-        <label className="flex items-center gap-1.5 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={settings.showTexture}
-            onChange={(e) =>
-              onChange({ ...settings, showTexture: e.target.checked })
-            }
-            className="accent-cream/60 w-3 h-3"
-          />
-          <span className="text-[10px] text-cream/50 font-sans">Texture</span>
-        </label>
-        <label className="flex items-center gap-1.5 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={settings.showMarkers}
-            onChange={(e) =>
-              onChange({ ...settings, showMarkers: e.target.checked })
-            }
-            className="accent-cream/60 w-3 h-3"
-          />
-          <span className="text-[10px] text-cream/50 font-sans">Markers</span>
-        </label>
-        <label className="flex items-center gap-1.5 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={settings.showOverlay}
-            onChange={(e) =>
-              onChange({ ...settings, showOverlay: e.target.checked })
-            }
-            className="accent-cream/60 w-3 h-3"
-          />
-          <span className="text-[10px] text-cream/50 font-sans">Overlay</span>
-        </label>
-        <label className="flex items-center gap-1.5 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={settings.showClouds}
-            onChange={(e) =>
-              onChange({ ...settings, showClouds: e.target.checked })
-            }
-            className="accent-cream/60 w-3 h-3"
-          />
-          <span className="text-[10px] text-cream/50 font-sans">Clouds</span>
-        </label>
-        <label className="flex items-center gap-1.5 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={settings.showBirds}
-            onChange={(e) =>
-              onChange({ ...settings, showBirds: e.target.checked })
-            }
-            className="accent-cream/60 w-3 h-3"
-          />
-          <span className="text-[10px] text-cream/50 font-sans">Birds</span>
-        </label>
+      <div className="border-t border-white/[0.06]" />
+
+      {/* ── Elements ───────────────────────────────────────────── */}
+      <div className="flex flex-col">
+        <GroupLabel>Elements</GroupLabel>
+        <Toggle label="Markers" checked={settings.showMarkers} onChange={(v) => onChange({ ...settings, showMarkers: v })} />
+        <Toggle label="Clouds" checked={settings.showClouds} onChange={(v) => onChange({ ...settings, showClouds: v })} />
+        <Toggle label="Birds" checked={settings.showBirds} onChange={(v) => onChange({ ...settings, showBirds: v })} />
       </div>
 
-      {/* Scene tweaks */}
-      <details className="mt-2 group">
-        <summary className="text-[10px] font-sans tracking-widest uppercase text-cream/40 cursor-pointer hover:text-cream/60 list-none flex items-center gap-1">
-          <span className="text-[8px] group-open:rotate-90 transition-transform">&#9654;</span>
-          Scene values
+      {/* ── Scene tweaks ───────────────────────────────────────── */}
+      <details className="group">
+        <summary className="text-[9px] font-sans font-semibold tracking-[0.15em] uppercase text-cream/30 cursor-pointer hover:text-cream/50 list-none flex items-center gap-1.5 py-1">
+          <span className="text-[8px] group-open:rotate-90 transition-transform duration-200">&#9654;</span>
+          Advanced
         </summary>
-        <div className="mt-2 flex flex-col gap-1.5">
+        <div className="mt-2 flex flex-col gap-1.5 pb-1">
           <TweakSlider label="Terrain rough" value={settings.tweaks.terrainRoughness} min={0} max={1} step={0.01} onChange={(v) => onChange({ ...settings, tweaks: { ...settings.tweaks, terrainRoughness: v } })} />
           <TweakSlider label="Terrain metal" value={settings.tweaks.terrainMetalness} min={0} max={1} step={0.01} onChange={(v) => onChange({ ...settings, tweaks: { ...settings.tweaks, terrainMetalness: v } })} />
           <TweakSlider label="Ocean rough" value={settings.tweaks.oceanRoughness} min={0} max={1} step={0.01} onChange={(v) => onChange({ ...settings, tweaks: { ...settings.tweaks, oceanRoughness: v } })} />
@@ -331,50 +328,42 @@ export default function Home() {
             </div>
           )}
 
-          {/* Debug panel */}
+          {/* Settings panel */}
           <div className="fixed bottom-6 left-6 z-40">
             {panelOpen ? (
-              <div className="rounded-xl bg-black/50 backdrop-blur-xl border border-white/10 p-4 min-w-[260px]">
+              <div className="rounded-2xl bg-black/60 backdrop-blur-2xl border border-white/[0.08] shadow-2xl shadow-black/40 p-5 min-w-[280px] max-h-[80vh] overflow-y-auto custom-scrollbar">
                 {/* Header */}
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-sans tracking-widest uppercase text-cream/70">
-                    Debug
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-[11px] font-sans font-semibold tracking-[0.2em] uppercase text-cream/80">
+                    Settings
                   </span>
                   <button
                     onClick={() => setPanelOpen(false)}
-                    className="text-cream/40 hover:text-cream text-sm leading-none"
+                    className="flex items-center justify-center w-6 h-6 rounded-md text-cream/30 hover:text-cream hover:bg-white/10 transition-all text-sm leading-none"
                   >
                     &times;
                   </button>
                 </div>
 
                 {/* Split toggle */}
-                <label className="flex items-center gap-2 cursor-pointer mb-3 pb-3 border-b border-white/10">
-                  <input
-                    type="checkbox"
-                    checked={split}
-                    onChange={(e) => setSplit(e.target.checked)}
-                    className="accent-cream/60 w-3 h-3"
-                  />
-                  <span className="text-[10px] text-cream/50 font-sans uppercase tracking-wider">
-                    Split view
-                  </span>
-                </label>
+                <div className="mb-4 pb-3 border-b border-white/[0.06]">
+                  <Toggle label="Split view" checked={split} onChange={setSplit} />
+                </div>
 
                 {/* Settings */}
                 {!split && (
                   <ViewPanel settings={leftSettings} onChange={setLeftSettings} />
                 )}
                 {split && (
-                  <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-4">
                     <ViewPanel
-                      label="Left"
+                      label="Left view"
                       settings={leftSettings}
                       onChange={setLeftSettings}
                     />
-                    <div className="border-t border-white/10" />
+                    <div className="border-t border-white/[0.08]" />
                     <ViewPanel
-                      label="Right"
+                      label="Right view"
                       settings={rightSettings}
                       onChange={setRightSettings}
                     />
@@ -384,9 +373,12 @@ export default function Home() {
             ) : (
               <button
                 onClick={() => setPanelOpen(true)}
-                className="flex h-9 w-9 items-center justify-center rounded-lg bg-black/40 text-cream/50 backdrop-blur-sm hover:bg-black/60 hover:text-cream transition-all text-xs font-sans"
+                className="group flex h-10 w-10 items-center justify-center rounded-xl bg-black/50 text-cream/40 backdrop-blur-xl border border-white/[0.08] hover:bg-black/70 hover:text-cream hover:border-white/20 hover:scale-105 transition-all shadow-lg shadow-black/30"
               >
-                ⚙
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="group-hover:rotate-45 transition-transform duration-300">
+                  <circle cx="12" cy="12" r="3" />
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                </svg>
               </button>
             )}
           </div>
